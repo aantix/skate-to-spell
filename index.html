@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Skate to Spell</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin: 0; font-family: Chalkboard, "Chalkboard SE", "Comic Sans MS", "Comic Neue", cursive;
+         background: linear-gradient(180deg, #1b2a6b 0%, #4a3a9c 40%, #b9e3ff 100%); color: #1d2a5a;
+         min-height: 100vh; text-align: center; overflow-x: hidden; }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 14px; }
+  h1 { font-size: 2.3rem; margin: 8px 0 2px; color: #fff; text-shadow: 0 0 10px #9fe3ff, 2px 2px 0 #6a4bd8; }
+  .sub { color: #e6f6ff; font-size: 1.1rem; margin-bottom: 12px; }
+  .card { background: rgba(255,255,255,.95); border-radius: 22px; padding: 16px; box-shadow: 0 6px 0 #8fc9ee; margin-bottom: 12px; }
+  .btn { display: block; width: 100%; font-family: inherit; font-size: 1.3rem; border: none; border-radius: 18px;
+         padding: 15px; margin: 9px 0; color: #fff; cursor: pointer; box-shadow: 0 5px 0 rgba(0,0,0,.2); }
+  .btn:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,.2); }
+  .ice { background: #38b6ff; } .pink { background: #ff5fa2; } .purple { background: #8b5cf6; } .gold { background: #e0a800; }
+  .gray { background: #8b93b0; }
+  .rule { text-align: left; font-size: 1.05rem; line-height: 1.5; }
+  .rule b { color: #e83e8c; }
+  .hud { display: flex; justify-content: space-between; color: #fff; font-size: 1.1rem; margin-bottom: 6px; }
+  .rink { position: relative; height: 230px; border-radius: 120px / 60px; margin: 6px 0 10px;
+          background: radial-gradient(ellipse at center, #ffffff 0%, #e3f5ff 60%, #b9e3ff 100%);
+          border: 6px solid #fff; box-shadow: inset 0 0 25px #9fd8f7, 0 6px 0 #8fc9ee; overflow: hidden; }
+  .rink:before { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; border-left: 3px solid #ff9cc8; opacity: .5; }
+  .skater { position: absolute; font-size: 2.6rem; left: 46%; top: 40%; transition: left .45s ease, top .45s ease, transform .45s; z-index: 5; pointer-events: none; }
+  .skater.spin { animation: spin 0.8s linear 2; }
+  .skater.wobble { animation: wob .35s ease 2; }
+  @keyframes spin { from { transform: rotate(0) } to { transform: rotate(360deg) } }
+  @keyframes wob { 0%,100% { transform: rotate(0) } 25% { transform: rotate(-20deg) } 75% { transform: rotate(20deg) } }
+  .flake { position: absolute; font-family: inherit; font-size: 1.8rem; width: 52px; height: 52px; border-radius: 50%;
+           border: 3px solid #7cc8f5; background: #fff; color: #1d2a5a; cursor: pointer; box-shadow: 0 3px 0 #8fc9ee; z-index: 3; }
+  .flake.used { opacity: .15; pointer-events: none; }
+  .flake.shake { animation: wob .3s 2; background: #ffd6d6; }
+  .answer { font-size: 2.4rem; min-height: 60px; letter-spacing: 5px; border-bottom: 4px dashed #8fc9ee; margin: 6px 0; }
+  .answer .ok { color: #1f9d55; } .answer .bad { color: #e5484d; text-decoration: underline; }
+  .peek { font-size: 3rem; letter-spacing: 6px; margin: 10px 0; }
+  .peek .hot { color: #e83e8c; text-decoration: underline; }
+  .msg { font-size: 1.2rem; min-height: 52px; margin: 6px 0; }
+  .row { display: flex; gap: 8px; } .row .btn { margin: 5px 0; font-size: 1.1rem; padding: 12px; }
+  .say { background: #fff3a8; color: #1d2a5a; box-shadow: 0 5px 0 #e6cf4f; }
+  .kb { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin: 8px 0; }
+  .key { font-family: inherit; font-size: 1.5rem; width: 40px; height: 50px; border-radius: 10px; border: none;
+         background: #e3f5ff; color: #1d2a5a; box-shadow: 0 4px 0 #8fc9ee; cursor: pointer; }
+  .key.wide { width: 90px; font-size: 1.1rem; }
+  .track { position: relative; height: 54px; background: #fff; border-radius: 30px; margin: 6px 0; border: 4px solid #b9e3ff; overflow: hidden; }
+  .track .skater { top: 2px; left: 2%; font-size: 2.2rem; }
+  .hidden { display: none; }
+  .best { color: #5a6a9a; font-size: 1rem; }
+  table.sb { width: 100%; border-collapse: collapse; font-size: 1.05rem; }
+  table.sb td, table.sb th { border-bottom: 1px solid #d6ecfb; padding: 4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>⛸️ Skate to Spell ⛸️</h1>
+  <div class="sub">Lesson 10 · Spelling test Thursday, Oct. 29</div>
+
+  <!-- HOME -->
+  <div id="home">
+    <div class="card rule">
+      <b>The Ice Rule ❄️</b><br>
+      When <b>c</b> or <b>g</b> comes right before <b>e, i, or y</b>, it gets soft:<br>
+      <b>c</b> says /s/ → fa<b>c</b>e, <b>c</b>ell, <b>c</b>enter, spa<b>c</b>e<br>
+      <b>g</b> says /j/ → <b>g</b>erm, pa<b>g</b>e, di<b>g</b>it<br>
+      Everywhere else they're hard: <b>c</b>arpet, <b>g</b>ray.<br>
+      Tricky word: <b>are</b> (you just have to know it!)
+    </div>
+    <button class="btn ice" onclick="startGame(1)">⛸️ Level 1: Glide to the Letters</button>
+    <button class="btn purple" onclick="startGame(2)">👀 Level 2: Peek, Hide, Spell</button>
+    <button class="btn gold" onclick="startGame(3)">🥇 Level 3: Gold Medal Routine</button>
+    <div class="card">
+      <b>This Week's Scores 🏆</b>
+      <table class="sb" id="scoreboard"></table>
+    </div>
+  </div>
+
+  <!-- PLAY -->
+  <div id="play" class="hidden">
+    <div class="hud"><span id="lvlName"></span><span>⭐ <span id="score">0</span></span><span id="prog"></span></div>
+    <div class="card">
+      <div class="row">
+        <button class="btn say" onclick="sayWord()">🔊 Hear word</button>
+        <button class="btn say" onclick="saySentence()">💬 Sentence</button>
+      </div>
+      <div id="peek" class="peek hidden"></div>
+      <div id="rink" class="rink hidden"><div id="skater" class="skater">⛸️</div></div>
+      <div id="track" class="track hidden"><div id="tskater" class="skater">⛸️</div></div>
+      <div id="answer" class="answer"></div>
+      <div id="kb" class="kb hidden"></div>
+      <div id="msg" class="msg"></div>
+      <button id="nextBtn" class="btn pink hidden" onclick="nextWord()">Next word ➜</button>
+    </div>
+    <button class="btn gray" onclick="goHome()">🏠 Back to the lodge</button>
+  </div>
+
+  <!-- DONE -->
+  <div id="done" class="hidden">
+    <div class="card">
+      <div style="font-size:4rem" id="medal">🥇</div>
+      <h2 id="doneTitle">Routine complete!</h2>
+      <div id="doneMsg" class="msg"></div>
+      <div class="best" id="bestMsg"></div>
+    </div>
+    <button class="btn ice" onclick="startGame(level)">⛸️ Skate it again</button>
+    <button class="btn gray" onclick="goHome()">🏠 Back to the lodge</button>
+  </div>
+</div>
+
+<script>
+var WORDS = [
+  { w: "germ",   hot: [0],    s: "Wash your hands so a germ can't make you sick.", tip: "g before e says /j/. Germ starts with G, not J!" },
+  { w: "page",   hot: [2],    s: "Turn the page in your book.", tip: "g-e at the end: the e makes the g soft AND makes the a say its name." },
+  { w: "gray",   hot: [0,3],  s: "The sky is gray and cloudy.", tip: "g before r is a hard g. It ends with a-y." },
+  { w: "digit",  hot: [2],    s: "The number 7 is one digit.", tip: "g before i says /j/. Di-git: two chunks." },
+  { w: "carpet", hot: [0],    s: "The cat took a nap on the carpet.", tip: "c before a is a hard c, like k. Car + pet!" },
+  { w: "face",   hot: [2],    s: "She has a big smile on her face.", tip: "c before e says /s/. Silent e at the end makes the a say its name." },
+  { w: "cell",   hot: [0,3],  s: "A cell is so tiny you need a microscope to see it.", tip: "c before e says /s/. Cell ends with TWO l's." },
+  { w: "space",  hot: [3],    s: "Astronauts fly into space.", tip: "Starts with s-p. Ends with c-e, the soft c sound." },
+  { w: "center", hot: [0,4],  s: "Skate to the center of the rink!", tip: "c before e says /s/. It ends with e-r." },
+  { w: "are",    hot: [0,1,2],s: "We are going ice skating!", tip: "Tricky word! a-r-e. It doesn't follow the rules, so memorize it." }
+];
+var DECOYS = { c: ["s","k"], g: ["j"], a: ["r"], y: ["e"] };
+var LEVELS = { 1: "⛸️ Glide", 2: "👀 Peek", 3: "🥇 Gold Medal" };
+var level = 1, queue = [], cur = null, typed = "", score = 0, done = 0, missedOnce = {}, firstTry = 0, locked = false, misses = 0;
+
+function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function $(id) { return document.getElementById(id); }
+function speak(t) { try { speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance(t); u.rate = 0.8; speechSynthesis.speak(u); } catch (e) {} }
+function sayWord() { if (cur) speak(cur.w); }
+function saySentence() { if (cur) speak(cur.w + ". " + cur.s + " " + cur.w + "."); }
+function show(id) { ["home","play","done"].forEach(function (x) { $(x).classList.toggle("hidden", x !== id); }); }
+
+function dayKey() { return ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date().getDay()]; }
+function loadSB() { try { return JSON.parse(localStorage.getItem("skateSB") || "{}"); } catch (e) { return {}; } }
+function renderSB() {
+  var sb = loadSB(), h = "<tr><th></th><th>⛸️ L1</th><th>👀 L2</th><th>🥇 L3</th></tr>";
+  ["Mon","Tue","Wed","Thu"].forEach(function (d) {
+    var r = sb[d] || {};
+    h += "<tr><td><b>" + d + "</b></td><td>" + (r[1] != null ? r[1] + "/10" : "·") + "</td><td>" + (r[2] != null ? r[2] + "/10" : "·") + "</td><td>" + (r[3] != null ? r[3] + "/10" : "·") + "</td></tr>";
+  });
+  $("scoreboard").innerHTML = h;
+}
+
+function startGame(l) {
+  level = l; queue = shuffle(WORDS.slice()); score = 0; done = 0; firstTry = 0; missedOnce = {};
+  $("lvlName").textContent = LEVELS[l]; $("score").textContent = 0;
+  show("play"); nextWord();
+}
+
+function nextWord() {
+  if (!queue.length) return finish();
+  cur = queue.shift(); typed = ""; locked = false; misses = 0;
+  $("prog").textContent = (done + 1) + " / " + (done + queue.length + 1);
+  $("msg").textContent = ""; $("nextBtn").classList.add("hidden");
+  $("answer").innerHTML = "&nbsp;";
+  $("rink").classList.add("hidden"); $("track").classList.add("hidden"); $("kb").classList.add("hidden"); $("peek").classList.add("hidden");
+  if (level === 1) setupRink();
+  if (level === 2) setupPeek();
+  if (level === 3) { setupKeyboard(); $("msg").textContent = "Listen, then spell it. No peeking! 🥇"; }
+  setTimeout(sayWord, 300);
+}
+
+/* LEVEL 1: letters are snowflakes on the ice, skater glides to each one in order (decoys included) */
+function setupRink() {
+  var rink = $("rink"); rink.classList.remove("hidden");
+  Array.prototype.slice.call(rink.querySelectorAll(".flake")).forEach(function (f) { f.remove(); });
+  var sk = $("skater"); sk.style.left = "46%"; sk.style.top = "40%";
+  var letters = cur.w.split("");
+  var extra = [];
+  letters.forEach(function (ch) { (DECOYS[ch] || []).forEach(function (d) { if (extra.indexOf(d) < 0 && letters.indexOf(d) < 0) extra.push(d); }); });
+  if (extra.length < 2) extra.push(["o","u","i"][Math.floor(Math.random() * 3)]);
+  var all = shuffle(letters.concat(extra.slice(0, 3)));
+  var spots = shuffle([[8,10],[25,6],[42,6],[60,6],[74,12],[8,58],[25,66],[58,66],[74,58],[42,70],[12,34],[70,34]]);
+  all.forEach(function (ch, i) {
+    var b = document.createElement("button"); b.className = "flake"; b.textContent = ch;
+    b.style.left = spots[i][0] + "%"; b.style.top = spots[i][1] + "%";
+    b.onclick = function () { tapFlake(b); };
+    rink.appendChild(b);
+  });
+  $("msg").textContent = "Skate to the letters in order! ❄️";
+}
+function tapFlake(b) {
+  if (locked) return;
+  var sk = $("skater"); sk.style.left = b.style.left; sk.style.top = b.style.top;
+  var need = cur.w[typed.length];
+  if (b.textContent === need) {
+    typed += need; b.classList.add("used"); renderTyped();
+    if (typed === cur.w) wordRight();
+  } else {
+    misses++; b.classList.add("shake"); sk.classList.add("wobble");
+    setTimeout(function () { b.classList.remove("shake"); sk.classList.remove("wobble"); }, 700);
+    $("msg").textContent = "Whoops, wobble! " + cur.tip;
+    if (!missedOnce[cur.w]) { missedOnce[cur.w] = true; queue.push(cur); }
+  }
+}
+
+/* LEVEL 2: peek at the word (tricky part highlighted), it hides, then spell from memory */
+function setupPeek() {
+  var p = $("peek"); p.classList.remove("hidden");
+  p.innerHTML = cur.w.split("").map(function (c, i) { return cur.hot.indexOf(i) >= 0 ? '<span class="hot">' + c + "</span>" : c; }).join("");
+  $("msg").textContent = "Look closely... it's about to melt! 💧 " + cur.tip;
+  locked = true;
+  setTimeout(function () {
+    if (!cur) return;
+    p.classList.add("hidden"); locked = false; setupKeyboard();
+    $("msg").textContent = "Now spell it from memory! ⛸️";
+  }, 3500);
+}
+
+/* LEVELS 2-3: full keyboard; skater glides along the track as she types */
+function setupKeyboard() {
+  $("kb").classList.remove("hidden"); $("track").classList.remove("hidden");
+  $("tskater").style.left = "2%";
+  var h = "";
+  "qwertyuiopasdfghjklzxcvbnm".split("").forEach(function (k) { h += '<button class="key" onclick="typeKey(\'' + k + '\')">' + k + "</button>"; });
+  h += '<button class="key wide" onclick="backKey()">⌫ oops</button><button class="key wide" style="background:#ff5fa2;color:#fff" onclick="check()">Done ✓</button>';
+  $("kb").innerHTML = h;
+}
+function typeKey(k) { if (locked || typed.length >= 10) return; typed += k; renderTyped(); moveTrack(); }
+function backKey() { if (locked) return; typed = typed.slice(0, -1); renderTyped(); moveTrack(); }
+function moveTrack() { $("tskater").style.left = Math.min(88, 2 + typed.length / cur.w.length * 86) + "%"; }
+function renderTyped() { $("answer").textContent = typed || "\u00a0"; }
+
+function check() {
+  if (locked || !typed) return;
+  if (typed === cur.w) return wordRight();
+  misses++;
+  var h = "";
+  for (var i = 0; i < Math.max(typed.length, cur.w.length); i++) {
+    var c = typed[i] || "_";
+    h += '<span class="' + (typed[i] === cur.w[i] ? "ok" : "bad") + '">' + c + "</span>";
+  }
+  $("answer").innerHTML = h;
+  $("tskater").classList.add("wobble"); setTimeout(function () { $("tskater").classList.remove("wobble"); }, 700);
+  if (!missedOnce[cur.w]) { missedOnce[cur.w] = true; queue.push(cur); }
+  if (misses >= 2) {
+    locked = true;
+    $("msg").innerHTML = "It's spelled <b>" + cur.w + "</b>. " + cur.tip + " It'll come back later, you've got this! 💪";
+    $("nextBtn").classList.remove("hidden");
+  } else {
+    $("msg").textContent = "So close! Red letters need fixing. " + cur.tip;
+    setTimeout(function () { if (!locked) { typed = ""; renderTyped(); moveTrack(); } }, 1600);
+  }
+}
+
+function wordRight() {
+  locked = true;
+  if (misses === 0 && !missedOnce[cur.w]) firstTry++;
+  score += misses === 0 ? 10 : 5; done++;
+  $("score").textContent = score;
+  var sk = level === 1 ? $("skater") : $("tskater");
+  if (level !== 1) sk.style.left = "88%";
+  sk.classList.add("spin"); setTimeout(function () { sk.classList.remove("spin"); }, 1700);
+  var cheers = ["Perfect spin! 🌟", "Triple axel! ⛸️✨", "The judges say 10/10! 🏆", "Ice queen! 👑", "Gold medal glide! 🥇"];
+  $("answer").innerHTML = '<span class="ok">' + cur.w + "</span>";
+  $("msg").textContent = cheers[Math.floor(Math.random() * cheers.length)];
+  speak(cur.w + ". Great job!");
+  $("nextBtn").classList.remove("hidden");
+}
+
+function finish() {
+  show("done");
+  var medal = firstTry >= 9 ? "🥇" : firstTry >= 6 ? "🥈" : "🥉";
+  $("medal").textContent = medal;
+  $("doneMsg").textContent = "You spelled " + firstTry + " out of 10 on the first try! ⭐ " + score + " points.";
+  var sb = loadSB(), d = dayKey(); sb[d] = sb[d] || {};
+  if (sb[d][level] == null || firstTry > sb[d][level]) sb[d][level] = firstTry;
+  try { localStorage.setItem("skateSB", JSON.stringify(sb)); } catch (e) {}
+  $("bestMsg").textContent = level < 3 ? "Ready to try the next level? ⛸️" : "Get 10/10 here and you're READY for Thursday! 🏆";
+}
+function goHome() { cur = null; renderSB(); show("home"); }
+renderSB();
+</script>
+</body>
+</html>
